@@ -1,0 +1,596 @@
+[
+    {
+        "filename": "images/keys/c64c_key_space.png",
+        "x": 164,
+        "y": 229,
+        "w": 475,
+        "h": 42,
+        "text": "SPACE",
+        "matrix_pos": 4
+    },
+    {
+        "filename": "images/keys/c64c_key_f7.png",
+        "x": 921,
+        "y": 175,
+        "w": 69,
+        "h": 42,
+        "text": "F7",
+        "matrix_pos": 63
+    },
+    {
+        "filename": "images/keys/c64c_key_cursor_right.png",
+        "x": 826,
+        "y": 175,
+        "w": 42,
+        "h": 42,
+        "text": "CURSOR_RIGHT",
+        "matrix_pos": 58
+    },
+    {
+        "filename": "images/keys/c64c_key_cursor_down.png",
+        "x": 772,
+        "y": 175,
+        "w": 42,
+        "h": 42,
+        "text": "CURSOR_DOWN",
+        "matrix_pos": 59
+    },
+    {
+        "filename": "images/keys/c64c_key_shift_right.png",
+        "x": 691,
+        "y": 175,
+        "w": 69,
+        "h": 42,
+        "text": "SHIFT_RIGHT",
+        "matrix_pos": 52
+    },
+    {
+        "filename": "images/keys/c64c_key_solidus.png",
+        "x": 637,
+        "y": 175,
+        "w": 42,
+        "h": 42,
+        "text": "/",
+        "matrix_pos": 51
+    },
+    {
+        "filename": "images/keys/c64c_key_full_stop.png",
+        "x": 583,
+        "y": 175,
+        "w": 42,
+        "h": 42,
+        "text": ".",
+        "matrix_pos": 44
+    },
+    {
+        "filename": "images/keys/c64c_key_comma.png",
+        "x": 529,
+        "y": 175,
+        "w": 42,
+        "h": 42,
+        "text": ",",
+        "matrix_pos": 43
+    },
+    {
+        "filename": "images/keys/c64c_key_m.png",
+        "x": 475,
+        "y": 175,
+        "w": 42,
+        "h": 42,
+        "text": "m",
+        "matrix_pos": 36
+    },
+    {
+        "filename": "images/keys/c64c_key_n.png",
+        "x": 421,
+        "y": 175,
+        "w": 42,
+        "h": 42,
+        "text": "n",
+        "matrix_pos": 35
+    },
+    {
+        "filename": "images/keys/c64c_key_b.png",
+        "x": 367,
+        "y": 175,
+        "w": 42,
+        "h": 42,
+        "text": "b",
+        "matrix_pos": 28
+    },
+    {
+        "filename": "images/keys/c64c_key_v.png",
+        "x": 313,
+        "y": 175,
+        "w": 42,
+        "h": 42,
+        "text": "v",
+        "matrix_pos": 27
+    },
+    {
+        "filename": "images/keys/c64c_key_c.png",
+        "x": 259,
+        "y": 175,
+        "w": 42,
+        "h": 42,
+        "text": "c",
+        "matrix_pos": 20
+    },
+    {
+        "filename": "images/keys/c64c_key_x.png",
+        "x": 205,
+        "y": 175,
+        "w": 42,
+        "h": 42,
+        "text": "x",
+        "matrix_pos": 19
+    },
+    {
+        "filename": "images/keys/c64c_key_z.png",
+        "x": 151,
+        "y": 175,
+        "w": 42,
+        "h": 42,
+        "text": "z",
+        "matrix_pos": 12
+    },
+    {
+        "filename": "images/keys/c64c_key_shift_left.png",
+        "x": 70,
+        "y": 175,
+        "w": 69,
+        "h": 42,
+        "text": "SHIFT_LEFT",
+        "matrix_pos": 11
+    },
+    {
+        "filename": "images/keys/c64c_key_commodore.png",
+        "x": 16,
+        "y": 175,
+        "w": 42,
+        "h": 42,
+        "text": "COMMODORE",
+        "matrix_pos": 5
+    },
+    {
+        "filename": "images/keys/c64c_key_f5.png",
+        "x": 921,
+        "y": 121,
+        "w": 69,
+        "h": 42,
+        "text": "F5",
+        "matrix_pos": 62
+    },
+    {
+        "filename": "images/keys/c64c_key_return.png",
+        "x": 772,
+        "y": 121,
+        "w": 96,
+        "h": 42,
+        "text": "RETURN",
+        "matrix_pos": 57
+    },
+    {
+        "filename": "images/keys/c64c_key_equals_sign.png",
+        "x": 718,
+        "y": 121,
+        "w": 42,
+        "h": 42,
+        "text": "=",
+        "matrix_pos": 53
+    },
+    {
+        "filename": "images/keys/c64c_key_semicolon.png",
+        "x": 664,
+        "y": 121,
+        "w": 42,
+        "h": 42,
+        "text": ";",
+        "matrix_pos": 50
+    },
+    {
+        "filename": "images/keys/c64c_key_colon.png",
+        "x": 610,
+        "y": 121,
+        "w": 42,
+        "h": 42,
+        "text": ":",
+        "matrix_pos": 45
+    },
+    {
+        "filename": "images/keys/c64c_key_l.png",
+        "x": 556,
+        "y": 121,
+        "w": 42,
+        "h": 42,
+        "text": "l",
+        "matrix_pos": 42
+    },
+    {
+        "filename": "images/keys/c64c_key_k.png",
+        "x": 502,
+        "y": 121,
+        "w": 42,
+        "h": 42,
+        "text": "k",
+        "matrix_pos": 37
+    },
+    {
+        "filename": "images/keys/c64c_key_j.png",
+        "x": 448,
+        "y": 121,
+        "w": 42,
+        "h": 42,
+        "text": "j",
+        "matrix_pos": 34
+    },
+    {
+        "filename": "images/keys/c64c_key_h.png",
+        "x": 394,
+        "y": 121,
+        "w": 42,
+        "h": 42,
+        "text": "h",
+        "matrix_pos": 29
+    },
+    {
+        "filename": "images/keys/c64c_key_g.png",
+        "x": 340,
+        "y": 121,
+        "w": 42,
+        "h": 42,
+        "text": "g",
+        "matrix_pos": 26
+    },
+    {
+        "filename": "images/keys/c64c_key_f.png",
+        "x": 286,
+        "y": 121,
+        "w": 42,
+        "h": 42,
+        "text": "f",
+        "matrix_pos": 21
+    },
+    {
+        "filename": "images/keys/c64c_key_d.png",
+        "x": 232,
+        "y": 121,
+        "w": 42,
+        "h": 42,
+        "text": "d",
+        "matrix_pos": 18
+    },
+    {
+        "filename": "images/keys/c64c_key_s.png",
+        "x": 178,
+        "y": 121,
+        "w": 42,
+        "h": 42,
+        "text": "s",
+        "matrix_pos": 13
+    },
+    {
+        "filename": "images/keys/c64c_key_a.png",
+        "x": 124,
+        "y": 121,
+        "w": 42,
+        "h": 42,
+        "text": "a",
+        "matrix_pos": 10
+    },
+    {
+        "filename": "images/keys/c64c_key_shift_lock.png",
+        "x": 70,
+        "y": 121,
+        "w": 42,
+        "h": 42,
+        "text": "SHIFT_LOCK",
+        "matrix_pos": 69
+    },
+    {
+        "filename": "images/keys/c64c_key_run_stop.png",
+        "x": 16,
+        "y": 121,
+        "w": 42,
+        "h": 42,
+        "text": "RUN_STOP",
+        "matrix_pos": 3
+    },
+    {
+        "filename": "images/keys/c64c_key_f3.png",
+        "x": 921,
+        "y": 67,
+        "w": 69,
+        "h": 42,
+        "text": "F3",
+        "matrix_pos": 61
+    },
+    {
+        "filename": "images/keys/c64c_key_restore.png",
+        "x": 813,
+        "y": 67,
+        "w": 69,
+        "h": 42,
+        "text": "RESTORE",
+        "matrix_pos": 64
+    },
+    {
+        "filename": "images/keys/c64c_key_up_arrow.png",
+        "x": 758,
+        "y": 67,
+        "w": 42,
+        "h": 42,
+        "text": "UP_ARROW",
+        "matrix_pos": 54
+    },
+    {
+        "filename": "images/keys/c64c_key_asterisk.png",
+        "x": 704,
+        "y": 67,
+        "w": 42,
+        "h": 42,
+        "text": "*",
+        "matrix_pos": 49
+    },
+    {
+        "filename": "images/keys/c64c_key_commercial_at.png",
+        "x": 650,
+        "y": 67,
+        "w": 42,
+        "h": 42,
+        "text": "@",
+        "matrix_pos": 46
+    },
+    {
+        "filename": "images/keys/c64c_key_p.png",
+        "x": 596,
+        "y": 67,
+        "w": 42,
+        "h": 42,
+        "text": "p",
+        "matrix_pos": 41
+    },
+    {
+        "filename": "images/keys/c64c_key_o.png",
+        "x": 542,
+        "y": 67,
+        "w": 42,
+        "h": 42,
+        "text": "o",
+        "matrix_pos": 38
+    },
+    {
+        "filename": "images/keys/c64c_key_i.png",
+        "x": 488,
+        "y": 67,
+        "w": 42,
+        "h": 42,
+        "text": "i",
+        "matrix_pos": 33
+    },
+    {
+        "filename": "images/keys/c64c_key_u.png",
+        "x": 434,
+        "y": 67,
+        "w": 42,
+        "h": 42,
+        "text": "u",
+        "matrix_pos": 30
+    },
+    {
+        "filename": "images/keys/c64c_key_y.png",
+        "x": 380,
+        "y": 67,
+        "w": 42,
+        "h": 42,
+        "text": "y",
+        "matrix_pos": 25
+    },
+    {
+        "filename": "images/keys/c64c_key_t.png",
+        "x": 326,
+        "y": 67,
+        "w": 42,
+        "h": 42,
+        "text": "t",
+        "matrix_pos": 22
+    },
+    {
+        "filename": "images/keys/c64c_key_e.png",
+        "x": 272,
+        "y": 67,
+        "w": 42,
+        "h": 42,
+        "text": "e",
+        "matrix_pos": 14
+    },
+    {
+        "filename": "images/keys/c64c_key_r.png",
+        "x": 218,
+        "y": 67,
+        "w": 42,
+        "h": 42,
+        "text": "r",
+        "matrix_pos": 17
+    },
+    {
+        "filename": "images/keys/c64c_key_w.png",
+        "x": 164,
+        "y": 67,
+        "w": 42,
+        "h": 42,
+        "text": "w",
+        "matrix_pos": 9
+    },
+    {
+        "filename": "images/keys/c64c_key_q.png",
+        "x": 110,
+        "y": 67,
+        "w": 42,
+        "h": 42,
+        "text": "q",
+        "matrix_pos": 6
+    },
+    {
+        "filename": "images/keys/c64c_key_ctrl.png",
+        "x": 30,
+        "y": 67,
+        "w": 69,
+        "h": 42,
+        "text": "CTRL",
+        "matrix_pos": 2
+    },
+    {
+        "filename": "images/keys/c64c_key_f1.png",
+        "x": 921,
+        "y": 13,
+        "w": 69,
+        "h": 42,
+        "text": "F1",
+        "matrix_pos": 60
+    },
+    {
+        "filename": "images/keys/c64c_key_del.png",
+        "x": 839,
+        "y": 13,
+        "w": 42,
+        "h": 42,
+        "text": "DEL",
+        "matrix_pos": 56
+    },
+    {
+        "filename": "images/keys/c64c_key_home.png",
+        "x": 785,
+        "y": 13,
+        "w": 42,
+        "h": 42,
+        "text": "HOME",
+        "matrix_pos": 55
+    },
+    {
+        "filename": "images/keys/c64c_key_pound_sign.png",
+        "x": 731,
+        "y": 13,
+        "w": 42,
+        "h": 42,
+        "text": "\u00a3",
+        "matrix_pos": 48
+    },
+    {
+        "filename": "images/keys/c64c_key_hyphen-minus.png",
+        "x": 677,
+        "y": 13,
+        "w": 42,
+        "h": 42,
+        "text": "-",
+        "matrix_pos": 47
+    },
+    {
+        "filename": "images/keys/c64c_key_plus_sign.png",
+        "x": 623,
+        "y": 13,
+        "w": 42,
+        "h": 42,
+        "text": "+",
+        "matrix_pos": 40
+    },
+    {
+        "filename": "images/keys/c64c_key_0.png",
+        "x": 569,
+        "y": 13,
+        "w": 42,
+        "h": 42,
+        "text": "0",
+        "matrix_pos": 39
+    },
+    {
+        "filename": "images/keys/c64c_key_9.png",
+        "x": 515,
+        "y": 13,
+        "w": 42,
+        "h": 42,
+        "text": "9",
+        "matrix_pos": 32
+    },
+    {
+        "filename": "images/keys/c64c_key_8.png",
+        "x": 461,
+        "y": 13,
+        "w": 42,
+        "h": 42,
+        "text": "8",
+        "matrix_pos": 31
+    },
+    {
+        "filename": "images/keys/c64c_key_7.png",
+        "x": 407,
+        "y": 13,
+        "w": 42,
+        "h": 42,
+        "text": "7",
+        "matrix_pos": 24
+    },
+    {
+        "filename": "images/keys/c64c_key_6.png",
+        "x": 353,
+        "y": 13,
+        "w": 42,
+        "h": 42,
+        "text": "6",
+        "matrix_pos": 23
+    },
+    {
+        "filename": "images/keys/c64c_key_5.png",
+        "x": 299,
+        "y": 13,
+        "w": 42,
+        "h": 42,
+        "text": "5",
+        "matrix_pos": 16
+    },
+    {
+        "filename": "images/keys/c64c_key_4.png",
+        "x": 245,
+        "y": 13,
+        "w": 42,
+        "h": 42,
+        "text": "4",
+        "matrix_pos": 15
+    },
+    {
+        "filename": "images/keys/c64c_key_3.png",
+        "x": 191,
+        "y": 13,
+        "w": 42,
+        "h": 42,
+        "text": "3",
+        "matrix_pos": 8
+    },
+    {
+        "filename": "images/keys/c64c_key_2.png",
+        "x": 137,
+        "y": 13,
+        "w": 42,
+        "h": 42,
+        "text": "2",
+        "matrix_pos": 7
+    },
+    {
+        "filename": "images/keys/c64c_key_1.png",
+        "x": 83,
+        "y": 13,
+        "w": 42,
+        "h": 42,
+        "text": "1",
+        "matrix_pos": 0
+    },
+    {
+        "filename": "images/keys/c64c_key_left_arrow.png",
+        "x": 29,
+        "y": 13,
+        "w": 42,
+        "h": 42,
+        "text": "LEFT_ARROW",
+        "matrix_pos": 1
+    }
+]

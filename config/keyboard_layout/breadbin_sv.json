@@ -1,0 +1,596 @@
+[
+    {
+        "filename": "images/keys/breadbin_key_space.png",
+        "x": 162,
+        "y": 227,
+        "w": 479,
+        "h": 48,
+        "text": "SPACE",
+        "matrix_pos": 4
+    },
+    {
+        "filename": "images/keys/breadbin_key_f7.png",
+        "x": 918,
+        "y": 173,
+        "w": 73,
+        "h": 49,
+        "text": "F7",
+        "matrix_pos": 63
+    },
+    {
+        "filename": "images/keys/breadbin_key_cursor_right.png",
+        "x": 823,
+        "y": 173,
+        "w": 47,
+        "h": 49,
+        "text": "CURSOR_RIGHT",
+        "matrix_pos": 58
+    },
+    {
+        "filename": "images/keys/breadbin_key_cursor_down.png",
+        "x": 769,
+        "y": 173,
+        "w": 47,
+        "h": 49,
+        "text": "CURSOR_DOWN",
+        "matrix_pos": 59
+    },
+    {
+        "filename": "images/keys/breadbin_key_shift_right.png",
+        "x": 689,
+        "y": 173,
+        "w": 73,
+        "h": 49,
+        "text": "SHIFT_RIGHT",
+        "matrix_pos": 52
+    },
+    {
+        "filename": "images/keys/breadbin_key_solidus.png",
+        "x": 634,
+        "y": 173,
+        "w": 47,
+        "h": 49,
+        "text": "/",
+        "matrix_pos": 51
+    },
+    {
+        "filename": "images/keys/breadbin_key_full_stop.png",
+        "x": 580,
+        "y": 173,
+        "w": 47,
+        "h": 49,
+        "text": ".",
+        "matrix_pos": 44
+    },
+    {
+        "filename": "images/keys/breadbin_key_comma.png",
+        "x": 526,
+        "y": 173,
+        "w": 47,
+        "h": 49,
+        "text": ",",
+        "matrix_pos": 43
+    },
+    {
+        "filename": "images/keys/breadbin_key_m.png",
+        "x": 472,
+        "y": 173,
+        "w": 47,
+        "h": 49,
+        "text": "m",
+        "matrix_pos": 36
+    },
+    {
+        "filename": "images/keys/breadbin_key_n.png",
+        "x": 418,
+        "y": 173,
+        "w": 47,
+        "h": 49,
+        "text": "n",
+        "matrix_pos": 35
+    },
+    {
+        "filename": "images/keys/breadbin_key_b.png",
+        "x": 364,
+        "y": 173,
+        "w": 47,
+        "h": 49,
+        "text": "b",
+        "matrix_pos": 28
+    },
+    {
+        "filename": "images/keys/breadbin_key_v.png",
+        "x": 310,
+        "y": 173,
+        "w": 47,
+        "h": 49,
+        "text": "v",
+        "matrix_pos": 27
+    },
+    {
+        "filename": "images/keys/breadbin_key_c.png",
+        "x": 256,
+        "y": 173,
+        "w": 48,
+        "h": 49,
+        "text": "c",
+        "matrix_pos": 20
+    },
+    {
+        "filename": "images/keys/breadbin_key_x.png",
+        "x": 204,
+        "y": 173,
+        "w": 45,
+        "h": 49,
+        "text": "x",
+        "matrix_pos": 19
+    },
+    {
+        "filename": "images/keys/breadbin_key_z.png",
+        "x": 149,
+        "y": 173,
+        "w": 46,
+        "h": 49,
+        "text": "z",
+        "matrix_pos": 12
+    },
+    {
+        "filename": "images/keys/breadbin_key_shift_left.png",
+        "x": 69,
+        "y": 173,
+        "w": 72,
+        "h": 49,
+        "text": "SHIFT_LEFT",
+        "matrix_pos": 11
+    },
+    {
+        "filename": "images/keys/breadbin_key_commodore.png",
+        "x": 15,
+        "y": 173,
+        "w": 47,
+        "h": 49,
+        "text": "COMMODORE",
+        "matrix_pos": 5
+    },
+    {
+        "filename": "images/keys/breadbin_key_f5.png",
+        "x": 918,
+        "y": 120,
+        "w": 73,
+        "h": 46,
+        "text": "F5",
+        "matrix_pos": 62
+    },
+    {
+        "filename": "images/keys/breadbin_key_return.png",
+        "x": 769,
+        "y": 120,
+        "w": 101,
+        "h": 46,
+        "text": "RETURN",
+        "matrix_pos": 57
+    },
+    {
+        "filename": "images/keys/breadbin_key_semicolon_sv.png",
+        "x": 715,
+        "y": 120,
+        "w": 47,
+        "h": 46,
+        "text": ";",
+        "matrix_pos": 53
+    },
+    {
+        "filename": "images/keys/breadbin_key_\u00e4.png",
+        "x": 661,
+        "y": 120,
+        "w": 48,
+        "h": 46,
+        "text": "\u00e4",
+        "matrix_pos": 50
+    },
+    {
+        "filename": "images/keys/breadbin_key_\u00f6.png",
+        "x": 607,
+        "y": 120,
+        "w": 46,
+        "h": 46,
+        "text": "\u00f6",
+        "matrix_pos": 45
+    },
+    {
+        "filename": "images/keys/breadbin_key_l.png",
+        "x": 553,
+        "y": 120,
+        "w": 47,
+        "h": 46,
+        "text": "l",
+        "matrix_pos": 42
+    },
+    {
+        "filename": "images/keys/breadbin_key_k.png",
+        "x": 500,
+        "y": 120,
+        "w": 45,
+        "h": 46,
+        "text": "k",
+        "matrix_pos": 37
+    },
+    {
+        "filename": "images/keys/breadbin_key_j.png",
+        "x": 444,
+        "y": 120,
+        "w": 48,
+        "h": 46,
+        "text": "j",
+        "matrix_pos": 34
+    },
+    {
+        "filename": "images/keys/breadbin_key_h.png",
+        "x": 391,
+        "y": 120,
+        "w": 47,
+        "h": 46,
+        "text": "h",
+        "matrix_pos": 29
+    },
+    {
+        "filename": "images/keys/breadbin_key_g.png",
+        "x": 338,
+        "y": 120,
+        "w": 45,
+        "h": 46,
+        "text": "g",
+        "matrix_pos": 26
+    },
+    {
+        "filename": "images/keys/breadbin_key_f.png",
+        "x": 284,
+        "y": 120,
+        "w": 45,
+        "h": 46,
+        "text": "f",
+        "matrix_pos": 21
+    },
+    {
+        "filename": "images/keys/breadbin_key_d.png",
+        "x": 230,
+        "y": 120,
+        "w": 46,
+        "h": 46,
+        "text": "d",
+        "matrix_pos": 18
+    },
+    {
+        "filename": "images/keys/breadbin_key_s.png",
+        "x": 175,
+        "y": 120,
+        "w": 47,
+        "h": 46,
+        "text": "s",
+        "matrix_pos": 13
+    },
+    {
+        "filename": "images/keys/breadbin_key_a.png",
+        "x": 123,
+        "y": 120,
+        "w": 44,
+        "h": 46,
+        "text": "a",
+        "matrix_pos": 10
+    },
+    {
+        "filename": "images/keys/breadbin_key_shift_lock.png",
+        "x": 69,
+        "y": 120,
+        "w": 45,
+        "h": 46,
+        "text": "SHIFT_LOCK",
+        "matrix_pos": 69
+    },
+    {
+        "filename": "images/keys/breadbin_key_run_stop.png",
+        "x": 15,
+        "y": 120,
+        "w": 47,
+        "h": 46,
+        "text": "RUN_STOP",
+        "matrix_pos": 3
+    },
+    {
+        "filename": "images/keys/breadbin_key_f3.png",
+        "x": 918,
+        "y": 66,
+        "w": 73,
+        "h": 45,
+        "text": "F3",
+        "matrix_pos": 61
+    },
+    {
+        "filename": "images/keys/breadbin_key_restore.png",
+        "x": 809,
+        "y": 66,
+        "w": 74,
+        "h": 45,
+        "text": "RESTORE",
+        "matrix_pos": 64
+    },
+    {
+        "filename": "images/keys/breadbin_key_up_arrow.png",
+        "x": 756,
+        "y": 66,
+        "w": 47,
+        "h": 45,
+        "text": "UP_ARROW",
+        "matrix_pos": 54
+    },
+    {
+        "filename": "images/keys/breadbin_key_commercial_at_sv.png",
+        "x": 701,
+        "y": 66,
+        "w": 46,
+        "h": 45,
+        "text": "@",
+        "matrix_pos": 49
+    },
+    {
+        "filename": "images/keys/breadbin_key_\u00e5.png",
+        "x": 648,
+        "y": 66,
+        "w": 47,
+        "h": 45,
+        "text": "\u00e5",
+        "matrix_pos": 46
+    },
+    {
+        "filename": "images/keys/breadbin_key_p.png",
+        "x": 593,
+        "y": 66,
+        "w": 47,
+        "h": 45,
+        "text": "p",
+        "matrix_pos": 41
+    },
+    {
+        "filename": "images/keys/breadbin_key_o.png",
+        "x": 540,
+        "y": 66,
+        "w": 47,
+        "h": 45,
+        "text": "o",
+        "matrix_pos": 38
+    },
+    {
+        "filename": "images/keys/breadbin_key_i.png",
+        "x": 486,
+        "y": 66,
+        "w": 47,
+        "h": 45,
+        "text": "i",
+        "matrix_pos": 33
+    },
+    {
+        "filename": "images/keys/breadbin_key_u.png",
+        "x": 432,
+        "y": 66,
+        "w": 46,
+        "h": 45,
+        "text": "u",
+        "matrix_pos": 30
+    },
+    {
+        "filename": "images/keys/breadbin_key_y.png",
+        "x": 377,
+        "y": 66,
+        "w": 48,
+        "h": 45,
+        "text": "y",
+        "matrix_pos": 25
+    },
+    {
+        "filename": "images/keys/breadbin_key_t.png",
+        "x": 325,
+        "y": 66,
+        "w": 46,
+        "h": 45,
+        "text": "t",
+        "matrix_pos": 22
+    },
+    {
+        "filename": "images/keys/breadbin_key_e.png",
+        "x": 270,
+        "y": 66,
+        "w": 45,
+        "h": 45,
+        "text": "e",
+        "matrix_pos": 14
+    },
+    {
+        "filename": "images/keys/breadbin_key_r.png",
+        "x": 216,
+        "y": 66,
+        "w": 46,
+        "h": 45,
+        "text": "r",
+        "matrix_pos": 17
+    },
+    {
+        "filename": "images/keys/breadbin_key_w.png",
+        "x": 163,
+        "y": 66,
+        "w": 46,
+        "h": 45,
+        "text": "w",
+        "matrix_pos": 9
+    },
+    {
+        "filename": "images/keys/breadbin_key_q.png",
+        "x": 108,
+        "y": 66,
+        "w": 46,
+        "h": 45,
+        "text": "q",
+        "matrix_pos": 6
+    },
+    {
+        "filename": "images/keys/breadbin_key_ctrl.png",
+        "x": 29,
+        "y": 66,
+        "w": 71,
+        "h": 45,
+        "text": "CTRL",
+        "matrix_pos": 2
+    },
+    {
+        "filename": "images/keys/breadbin_key_f1.png",
+        "x": 918,
+        "y": 12,
+        "w": 73,
+        "h": 47,
+        "text": "F1",
+        "matrix_pos": 60
+    },
+    {
+        "filename": "images/keys/breadbin_key_del.png",
+        "x": 837,
+        "y": 12,
+        "w": 46,
+        "h": 47,
+        "text": "DEL",
+        "matrix_pos": 56
+    },
+    {
+        "filename": "images/keys/breadbin_key_home.png",
+        "x": 783,
+        "y": 12,
+        "w": 47,
+        "h": 47,
+        "text": "HOME",
+        "matrix_pos": 55
+    },
+    {
+        "filename": "images/keys/breadbin_key_colon_sv.png",
+        "x": 729,
+        "y": 12,
+        "w": 45,
+        "h": 47,
+        "text": ":",
+        "matrix_pos": 48
+    },
+    {
+        "filename": "images/keys/breadbin_key_equals_sign_sv.png",
+        "x": 675,
+        "y": 12,
+        "w": 45,
+        "h": 47,
+        "text": "=",
+        "matrix_pos": 47
+    },
+    {
+        "filename": "images/keys/breadbin_key_hyphen-minus_sv.png",
+        "x": 621,
+        "y": 12,
+        "w": 46,
+        "h": 47,
+        "text": "-",
+        "matrix_pos": 40
+    },
+    {
+        "filename": "images/keys/breadbin_key_0.png",
+        "x": 567,
+        "y": 12,
+        "w": 46,
+        "h": 47,
+        "text": "0",
+        "matrix_pos": 39
+    },
+    {
+        "filename": "images/keys/breadbin_key_9.png",
+        "x": 513,
+        "y": 12,
+        "w": 46,
+        "h": 47,
+        "text": "9",
+        "matrix_pos": 32
+    },
+    {
+        "filename": "images/keys/breadbin_key_8.png",
+        "x": 459,
+        "y": 12,
+        "w": 46,
+        "h": 47,
+        "text": "8",
+        "matrix_pos": 31
+    },
+    {
+        "filename": "images/keys/breadbin_key_7.png",
+        "x": 405,
+        "y": 12,
+        "w": 46,
+        "h": 47,
+        "text": "7",
+        "matrix_pos": 24
+    },
+    {
+        "filename": "images/keys/breadbin_key_6.png",
+        "x": 351,
+        "y": 12,
+        "w": 46,
+        "h": 47,
+        "text": "6",
+        "matrix_pos": 23
+    },
+    {
+        "filename": "images/keys/breadbin_key_5.png",
+        "x": 297,
+        "y": 12,
+        "w": 47,
+        "h": 47,
+        "text": "5",
+        "matrix_pos": 16
+    },
+    {
+        "filename": "images/keys/breadbin_key_4.png",
+        "x": 243,
+        "y": 12,
+        "w": 47,
+        "h": 47,
+        "text": "4",
+        "matrix_pos": 15
+    },
+    {
+        "filename": "images/keys/breadbin_key_3.png",
+        "x": 190,
+        "y": 12,
+        "w": 46,
+        "h": 47,
+        "text": "3",
+        "matrix_pos": 8
+    },
+    {
+        "filename": "images/keys/breadbin_key_2.png",
+        "x": 135,
+        "y": 12,
+        "w": 45,
+        "h": 47,
+        "text": "2",
+        "matrix_pos": 7
+    },
+    {
+        "filename": "images/keys/breadbin_key_1.png",
+        "x": 81,
+        "y": 12,
+        "w": 46,
+        "h": 47,
+        "text": "1",
+        "matrix_pos": 0
+    },
+    {
+        "filename": "images/keys/breadbin_key_left_arrow.png",
+        "x": 29,
+        "y": 12,
+        "w": 45,
+        "h": 47,
+        "text": "LEFT_ARROW",
+        "matrix_pos": 1
+    }
+]
