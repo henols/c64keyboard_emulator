@@ -5,6 +5,7 @@ import tkinter as tk
 
 from PIL import ImageTk, Image
 
+import connection
 import time
 import argparse
 import serial
@@ -24,7 +25,6 @@ LOAD_ACEONE = LINE_PREFIX + 'load"http://c64.aceone.se",8:{RETURN}'
 LOAD_MEATLOAF = LINE_PREFIX + 'load"ml:*",8:{RETURN}'
 
 HEX_PREFIX = "0x"
-BAUD = 19200
 
 serialDevice = None
 
@@ -86,19 +86,19 @@ def parse_key_combinations(key_combo, pressed=True):
     if values:
         print(f"key combination: {key_combo}")
         for val in values:
-            img = key_imgs.get(val & 0x7F, None)
+            img = key_imgages.get(val & 0x7F, None)
             if img:
                 s = "normal" if val & 0x80 else "hidden"
                 canvas.itemconfig(img["id"], state=s)
             if val & 0xC3 == 0xC3:
-                for img in key_imgs.values():
+                for img in key_imgages.values():
                     canvas.itemconfig(img["id"], state="hidden")
         hex_string = " ".join(f"{HEX_PREFIX}{element:02X}" for element in values)
         print(f"values: {hex_string}")
-        if not args.dummy:
-            written = arduino.write(bytearray([len(values)]))
-            written = arduino.write(values)
-            arduino.flush()
+        if connection and connection.is_connected():
+            written = connection.write(bytearray([len(values)]))
+            written = connection.write(values)
+            connection.flush()
         print("------------ Sent-----------------------")
     else:
         print(f"Unknown key combination: {key_combo}")
@@ -146,14 +146,18 @@ def on_key_event(event, pressed):
 
 
 def read_input():
-    if not args.dummy:
-        while True:
-            line = arduino.readline()
-            if len(line.strip()) > 0:
-                data = line.decode("utf-8").strip()
-                print(f" --> {data}")
-            else:
-                break
+    if connection:
+        if connection.is_connected():
+            while True:
+                line = connection.readline()
+                if len(line.strip()) > 0:
+                    data = line.decode("utf-8").strip()
+                    print(f" --> {data}")
+                else:
+                    break
+        else:
+            print("Connection lost")
+            connection.connect()
     window.after(200, read_input)
 
 
@@ -164,7 +168,7 @@ def handle_focus(event):
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description="key64tapper, a C64 keyboard emulator."
+        description="c64keyboard, a C64 keyboard emulator."
     )
     specifyDevices = parser.add_mutually_exclusive_group(required=True)
     specifyDevices.add_argument(
@@ -187,35 +191,22 @@ def parse_args():
         action="store_true",
         help="Dummy mode. Don't connect to a device, print all serial output to STDOUT instead.",
     )
-    parser.add_argument(
-        "-r",
-        action="store",
-        type=str,
-        dest="rawString",
-        required=False,
-        help="User-supplied string of keys to send.",
-    )
-    parser.add_argument(
-        "-i",
-        "--interactive",
-        action="store_true",
-        help="Interactive mode. Whatever you type is passed on to Commodore.",
-    )
     return parser.parse_args()
 
 
 def load_config():
     global key_matrix, layout, no_shift, special_release_keys, special_keys, key_mappings, c64_type, lang
     c64_type = "breadbin"
-    lang = "_sv"
-    # lang =""
+    # c64_type = "c64c"
+    # lang = "_sv"
+    lang = ""
 
     key_layout = json.load(open(f"config/keyboard_matrix{lang}.json"))
     layout = key_layout["layout"]
-    print(f"Using key map: {layout}")
+    print(f"Loading layout {c64_type} {layout}")
     key_matrix = key_layout["matrix"]
     no_shift = key_layout["no-shift"]
-    
+
     special_release_keys = {}
     if "special-release-keys" in key_layout:
         special_release_keys = key_layout["special-release-keys"]
@@ -245,9 +236,11 @@ if __name__ == "__main__":
 
     if not args.dummy:
         try:
-            print(f"Using device: {serialDevice}")
-            arduino = serial.Serial(serialDevice, BAUD, timeout=0.1, write_timeout=0.1)
+            print(f"Connecting to device: {serialDevice}")
+            # arduino = serial.Serial(serialDevice, BAUD, timeout=0.1, write_timeout=0.1)
             # arduino = serial.Serial(serialDevice, BAUD)
+            connection = connection.SerialConnection(serialDevice)
+            connection.connect()
         except:
             print("Cannot open serial device, exiting.")
             sys.exit()
@@ -284,18 +277,16 @@ if __name__ == "__main__":
     kb = canvas.create_image(0, 0, anchor=tk.NW, image=bgImg)
     canvas.pack()
 
-    # returns JSON object as
-    # a dictionary
-    keys_info = json.load(open(f"config/keyboard_layout/{c64_type}{lang}.json"))
+    keyboard_layout = json.load(open(f"config/keyboard_layout/{c64_type}{lang}.json"))
 
     # # canvas = tk.Canvas(window, height=250, width=300)
-    key_imgs = {}
-    for detail in keys_info:
-        img = ImageTk.PhotoImage(Image.open(detail["filename"]))
+    key_imgages = {}
+    for key in keyboard_layout:
+        img = ImageTk.PhotoImage(Image.open(key["filename"]))
         id = canvas.create_image(
-            detail["x"], detail["y"], anchor=tk.NW, image=img, state="hidden"
+            key["x"], key["y"], anchor=tk.NW, image=img, state="hidden"
         )
-        key_imgs[detail["matrix_pos"]] = {"img": img, "id": id}
+        key_imgages[key["matrix_pos"]] = {"img": img, "id": id}
 
     window.update()
 
