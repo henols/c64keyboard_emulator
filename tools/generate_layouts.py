@@ -95,7 +95,7 @@ if __name__ == "__main__":
         layout = "_" + layout if layout != "us" else ""
         key_matrix, key_positions, special_keys = load_config(layout)
         for c64_type in c64_types:
-            pressed_keys = f"images/{c64_type}_pressed{layout}.png"
+            pressed_keys = f"tools/images/{c64_type}_pressed{layout}.png"
             if not os.path.exists(pressed_keys):
                 continue
             img = cv2.imread(pressed_keys)
