@@ -46,11 +46,9 @@
         "Right": "CURSOR_RIGHT",
         "Left": "SHIFT_LEFT|CURSOR_RIGHT",
         "Pause": "RESET_MATRIX",
-        "Scroll_Lock": "WARM_RESET",
-        "Menu": "COLD_RESET",
-        "F9": "LOAD_DIR",
-        "F10": "LOAD_8",
-        "F11": "LOAD_ACEONE",
-        "F12": "LOAD_MEATLOAF"
+        "Ctrl_w": "WARM_RESET",
+        "Ctrl_r": "COLD_RESET",
+        "Ctrl_l": "LOAD_DIR",
+        "Ctrl_d": "LOAD_8"
     }
 }

@@ -21,8 +21,6 @@ import os
 LINE_PREFIX = "CommadLine:"
 LOAD_8 = LINE_PREFIX + "load" + ("{CURSOR_RIGHT}") * 19 + ",8:{RETURN}"
 LOAD_DIR = LINE_PREFIX + 'load"$",8:{RETURN}'
-LOAD_ACEONE = LINE_PREFIX + 'load"http://c64.aceone.se",8:{RETURN}'
-LOAD_MEATLOAF = LINE_PREFIX + 'load"ml:*",8:{RETURN}'
 
 HEX_PREFIX = "0x"
 
@@ -71,6 +69,8 @@ def build_key_combination(c, pressed=True):
 
     if key_combo == "LOAD_DIR":
         key_combo = LOAD_DIR
+    elif key_combo == "LOAD_8":
+        key_combo = LOAD_8
 
     if not pressed:
         value = get_special_release_value(c)
@@ -90,7 +90,7 @@ def parse_key_combinations(key_combo, pressed=True):
             if img:
                 s = "normal" if val & 0x80 else "hidden"
                 canvas.itemconfig(img["id"], state=s)
-            if val & 0xC3 == 0xC3:
+            if val & 0xC3 == 0xC3 or val & 0x44 == 0x44:
                 for img in key_imgages.values():
                     canvas.itemconfig(img["id"], state="hidden")
         hex_string = " ".join(f"{HEX_PREFIX}{element:02X}" for element in values)
@@ -130,12 +130,15 @@ def process_key(c, pressed=True):
 
 
 def decode_key(event):
+    print(f"event: {event}")
     if event.keysym_num >= 33 and event.keysym_num <= 126:
         key = chr(event.keysym_num)
     elif event.keysym == "??":
         key = event.char
     else:
         key = event.keysym
+    if event.state & 4 == 4:
+        key = "Ctrl_" + key
     return key
 
 
