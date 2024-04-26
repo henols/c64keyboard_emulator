@@ -1,0 +1,7 @@
+include README.md
+include LICENSE
+recursive-include c64keyboard *.py
+recursive-include images *.png
+recursive-include config *.json
+recursive-exclude tools *.json *.png *.py
+recursive-exclude c64keyboard_emulator.egg-info *

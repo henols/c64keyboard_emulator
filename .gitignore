@@ -1,2 +1,5 @@
 
 c64keyboard/__pycache__/
+c64keyboard_emulator.egg-info
+dist/
+build/
