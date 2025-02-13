@@ -5,7 +5,7 @@ import tkinter as tk
 
 from PIL import ImageTk, Image
 
-import connection
+from . import connection
 import time
 import argparse
 import serial
@@ -17,6 +17,8 @@ import sys
 import termios
 import os
 
+import logging
+
 
 LINE_PREFIX = "CommadLine:"
 LOAD_8 = LINE_PREFIX + "load" + ("{CURSOR_RIGHT}") * 19 + ",8:{RETURN}"
@@ -25,6 +27,10 @@ LOAD_DIR = LINE_PREFIX + 'load"$",8:{RETURN}'
 HEX_PREFIX = "0x"
 
 serialDevice = None
+
+conn = None
+
+log = logging.getLogger("c64keyboard")
 
 
 def get_matrix_value(c):
@@ -51,7 +57,7 @@ def combination_to_matrix(c, pressed):
         value = get_matrix_value(l)
         if value < 0:
             value = get_special_value(l)
-        #        print(f"cmd: {l}, pressed: {matrix_val}")
+        #        log.debug(f"cmd: {l}, pressed: {matrix_val}")
         if value >= 0 and value not in values:
             values.append(value | 0x80 if matrix_val else value)
 
@@ -84,7 +90,7 @@ def parse_key_combinations(key_combo, pressed=True):
     values = combination_to_matrix(key_combo, pressed)
 
     if values:
-        print(f"key combination: {key_combo}")
+        (f"key combination: {key_combo}")
         for val in values:
             img = key_imgages.get(val & 0x7F, None)
             if img:
@@ -94,25 +100,25 @@ def parse_key_combinations(key_combo, pressed=True):
                 for img in key_imgages.values():
                     canvas.itemconfig(img["id"], state="hidden")
         hex_string = " ".join(f"{HEX_PREFIX}{element:02X}" for element in values)
-        print(f"values: {hex_string}")
-        if connection and connection.is_connected():
-            written = connection.write(bytearray([len(values)]))
-            written = connection.write(values)
-            connection.flush()
-        print("------------ Sent-----------------------")
+        log.debug(f"values: {hex_string}")
+        if conn and conn.is_connected():
+            written = conn.write(bytearray([len(values)]))
+            written = conn.write(values)
+            conn.flush()
+        log.debug("------------ Sent-----------------------")
     else:
-        print(f"Unknown key combination: {key_combo}")
-        print("----------------------------------------")
+        log.debug(f"Unknown key combination: {key_combo}")
+        log.debug("----------------------------------------")
 
 
 def process_key(c, pressed=True):
     hex_string = ""
     if re.match("[\\w!@#$%^&*()-_=+\\\\|,<.>/?`~\\[\\]{}\"\\']", c):
-        print(f"'{c}' in hex = 0x")
+        log.debug(f"'{c}' in hex = 0x")
     else:
         for element in c:
             hex_string += f"0x{ord(element):02X} "
-    print(f"other key: {hex_string}")
+    log.debug(f"other key: {hex_string}")
 
     key_combo = build_key_combination(c, pressed)
     if key_combo.startswith(LINE_PREFIX):
@@ -120,7 +126,7 @@ def process_key(c, pressed=True):
             return
         parse_key_combinations("TEXT", True)
         for m in re.finditer(r"(\{(\w+)\})|.", key_combo[len(LINE_PREFIX) :]):
-            # print (m.group().strip("{}"))
+            # log.debug (m.group().strip("{}"))
             key_combo = build_key_combination(m.group().strip("{}"))
             parse_key_combinations(key_combo)
             time.sleep(0.05)
@@ -130,7 +136,7 @@ def process_key(c, pressed=True):
 
 
 def decode_key(event):
-    print(f"event: {event}")
+    log.debug(f"event: {event}")
     if event.keysym_num >= 33 and event.keysym_num <= 126:
         key = chr(event.keysym_num)
     elif event.keysym == "??":
@@ -144,23 +150,23 @@ def decode_key(event):
 
 def on_key_event(event, pressed):
     key = decode_key(event)
-    print(f"Key {'pressed' if pressed else 'released'}: {key}")
+    log.debug(f"Key {'pressed' if pressed else 'released'}: {key}")
     process_key(key, pressed)
 
 
 def read_input():
-    if connection:
-        if connection.is_connected():
+    if conn:
+        if conn.is_connected():
             while True:
-                line = connection.readline()
+                line = conn.readline()
                 if len(line.strip()) > 0:
                     data = line.decode("utf-8").strip()
-                    print(f" --> {data}")
+                    log.debug(f" --> {data}")
                 else:
                     break
         else:
-            print("Connection lost")
-            connection.connect()
+            log.debug("Connection lost")
+            conn.connect()
     window.after(200, read_input)
 
 
@@ -192,7 +198,7 @@ def parse_args():
         "-D",
         "--dummy",
         action="store_true",
-        help="Dummy mode. Don't connect to a device, print all serial output to STDOUT instead.",
+        help="Dummy mode. Don't connect to a device, log.debug all serial output to STDOUT instead.",
     )
     return parser.parse_args()
 
@@ -206,7 +212,7 @@ def load_config():
 
     key_layout = json.load(open(f"config/keyboard_matrix{lang}.json"))
     layout = key_layout["layout"]
-    print(f"Loading layout {c64_type} {layout}")
+    log.debug(f"Loading layout {c64_type} {layout}")
     key_matrix = key_layout["matrix"]
     no_shift = key_layout["no-shift"]
 
@@ -224,10 +230,27 @@ def donothing():
     x = 0
 
 
+def create_debug_console_handler():
+    # Create a console handler and set its level to DEBUG
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(logging.DEBUG)
+
+    # Create a formatter and set it for the handler
+    formatter = logging.Formatter(
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    )
+    console_handler.setFormatter(formatter)
+    return console_handler
+
+
 if __name__ == "__main__":
+
+    log.addHandler(create_debug_console_handler())
+    log.setLevel(logging.DEBUG)
+
     args = parse_args()
     if args.list:
-        print(
+        log.debug(
             "\n".join(
                 f"Device: {p.device} ; Description: {p.description}"
                 for p in serial.tools.list_ports.comports()
@@ -239,13 +262,13 @@ if __name__ == "__main__":
 
     if not args.dummy:
         try:
-            print(f"Connecting to device: {serialDevice}")
+            log.debug(f"Connecting to device: {serialDevice}")
             # arduino = serial.Serial(serialDevice, BAUD, timeout=0.1, write_timeout=0.1)
             # arduino = serial.Serial(serialDevice, BAUD)
-            connection = connection.SerialConnection(serialDevice)
-            connection.connect()
+            conn = connection.SerialConnection(serialDevice)
+            conn.connect()
         except:
-            print("Cannot open serial device, exiting.")
+            log.debug("Cannot open serial device, exiting.")
             sys.exit()
         # Give serial interface time to settle down
         time.sleep(1)
@@ -296,7 +319,7 @@ if __name__ == "__main__":
     window.after(20, read_input)
     # Run the GUI event loop
     window.mainloop()
-    print("Exiting...")
+    log.debug("Exiting...")
     sys.exit()
 
 
@@ -307,7 +330,7 @@ if __name__ == "__main__":
 #     #     excisting = cv2.imread(filename)
 #     #     # compute difference
 #     #     difference = cv2.subtract(square_img, excisting)
-#     #     print(f"Diff: {np.sum(difference)}")
+#     #     log.debug(f"Diff: {np.sum(difference)}")
 
 #     cv2.imwrite(filename, square_img)
 #     return filename
