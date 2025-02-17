@@ -1,17 +1,21 @@
 import json
 import logging
+import os
 import re
-import time 
+import time
+
 
 class C64KeyboardLogic:
     HEX_PREFIX = "0x"
     LINE_PREFIX = "CommadLine:"
     LOAD_8 = LINE_PREFIX + "load" + ("{CURSOR_RIGHT}") * 19 + ",8:{RETURN}"
     LOAD_DIR = LINE_PREFIX + 'load"$",8:{RETURN}'
-    HEX_PREFIX = "0x"
-    WINDOW_TITLE = "C64 Keyboard, {layout} layout"
-    WINDOW_GEOMETRY = "1006x290"
-    CONFIG_PATH = "config/keyboard_layout/{c64_type}{lang}.json"
+
+    CONFIG_PATH = "config/"
+    KEY_CONFIG_PATH = "{config_path}/key_config.json"
+    KEYBOARD_LAYOUT_PATH = "{config_path}/keyboard_layout"
+    KEYBOARD_LAYOUT_FILE_PATH = KEYBOARD_LAYOUT_PATH + "/{c64_type}{lang}.json"
+    KEYBOARD_MATRIX_PATH = "{config_path}/keyboard_matrix{lang}.json"
     IMAGE_PATH = "images/{c64_type}_keyboard{lang}.png"
 
     def __init__(self):
@@ -23,30 +27,55 @@ class C64KeyboardLogic:
         self.key_mappings = {}
         self.c64_type = "breadbin"
         self.lang = ""
+        self.key_layout = {}
+
+    def create_path(self, path):
+        return path.format(
+            config_path=self.CONFIG_PATH,
+            c64_type=self.c64_type,
+            lang=f"_{self.lang}" if self.lang and not self.lang == "en" else "",
+        )
+
+    def get_key_layouts(self):
+        layout_info = []
+        config_dir = self.create_path(self.KEYBOARD_LAYOUT_PATH)
+        for filename in os.listdir(config_dir):
+            if filename.endswith(".json"):
+                keyboard_layout = json.load(open(f"{config_dir}/{filename}"))
+                layout_info.append(
+                    (keyboard_layout["type"], keyboard_layout["lang"], keyboard_layout["name"])
+                )
+        return layout_info
+
+    def get_key_layout(self):
+        keyboard_layout_path = self.create_path(self.KEYBOARD_LAYOUT_FILE_PATH)
+        self.log.debug(f"Loading keyboard layout {keyboard_layout_path}")
+        keyboard_layout = json.load(open(keyboard_layout_path))
+        return keyboard_layout["keys"]
 
     def load_config(self, type="breadbin", lang=""):
         self.c64_type = type
         self.lang = lang
 
-        if lang:
-            config_path = f"config/keyboard_matrix_{lang}.json"
-        else:
-            config_path = "config/keyboard_matrix.json"
-
-        key_layout = json.load(open(config_path))
-        self.layout = key_layout["layout"]
+        config_path = self.create_path(self.KEYBOARD_MATRIX_PATH)
+        self.log.debug(f"Loading matrix {config_path}")
+        self.key_layout = json.load(open(config_path))
+        self.layout = self.key_layout["layout"]
         self.log.debug(f"Loading layout {self.c64_type} {self.layout}")
-        self.key_matrix = key_layout["matrix"]
-        self.no_shift = key_layout["no-shift"]
+        self.key_matrix = self.key_layout["matrix"]
+        self.no_shift = self.key_layout["no-shift"]
 
         self.special_release_keys = {}
-        if "special-release-keys" in key_layout:
-            self.special_release_keys = key_layout["special-release-keys"]
+        if "special-release-keys" in self.key_layout:
+            self.special_release_keys = self.key_layout["special-release-keys"]
 
-        key_config = json.load(open(f"config/key_config.json"))
+        key_config_path = self.create_path(self.KEY_CONFIG_PATH)
+        self.log.debug(f"Loading key config {key_config_path}")
+        key_config = json.load(open(key_config_path))
+
         self.special_keys = key_config["special-keys"]
         self.key_mappings = key_config["key-mappings"]
-        self.key_mappings.update(key_layout["key-mappings"])
+        self.key_mappings.update(self.key_layout["key-mappings"])
 
     def get_matrix_value(self, c):
         return self.key_matrix.get(c, -1)
@@ -100,7 +129,9 @@ class C64KeyboardLogic:
 
         if values:
             self.log.debug(f"key combination: {key_combo}")
-            hex_string = " ".join(f"{self.HEX_PREFIX}{element:02X}" for element in values)
+            hex_string = " ".join(
+                f"{self.HEX_PREFIX}{element:02X}" for element in values
+            )
             self.log.debug(f"values: {hex_string}")
             return values
         else:
@@ -122,7 +153,7 @@ class C64KeyboardLogic:
             if not pressed:
                 return
             self.parse_key_combinations("TEXT", True)
-            for m in re.finditer(r"(\{(\w+)\})|.", key_combo[len(self.LINE_PREFIX):]):
+            for m in re.finditer(r"(\{(\w+)\})|.", key_combo[len(self.LINE_PREFIX) :]):
                 key_combo = self.build_key_combination(m.group().strip("{}"))
                 self.parse_key_combinations(key_combo)
                 time.sleep(0.05)

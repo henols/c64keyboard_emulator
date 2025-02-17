@@ -74,6 +74,9 @@ class SerialConnection:
         self.post_event("disconnected")
 
     def connect(self):
+        if not (self.connected or self.path):
+            return
+            
         self.log.debug(f"Attempting to reconnect to {self.path}...")
         if not self.connected:
             try:

@@ -30,8 +30,9 @@ def get_square_position(square):
     return x, y, w, h
 
 
-def save_square(img, x, y, w, h, c64_type, key_text, layout):
-    filename = f"images/keys/{c64_type}_key_{key_text}.png"
+def save_square(img, x, y, w, h, c64_type, key_text, layout, layout_sufix):
+    key_name = f"{c64_type}_key_{key_text}"
+    filename = f"images/keys/{key_name}.png"
     square_img = img[y : y + h, x : x + w]
     if os.path.exists(filename):
         excisting = cv2.imread(filename)
@@ -39,11 +40,12 @@ def save_square(img, x, y, w, h, c64_type, key_text, layout):
             excisting.size == square_img.size
             and np.sum(cv2.subtract(square_img, excisting)) == 0
         ):
-            return filename, False
-        filename = f"images/keys/{c64_type}_key_{key_text}{layout}.png"
+            return f"{key_name}.png", False
+    key_name = f"{key_name}{layout_sufix}"
+    filename = f"images/keys/{key_name}.png"
     print(f"Saving {filename}")
-    cv2.imwrite(filename, square_img)
-    return filename, True
+    cv2.imwrite(f"{filename}", square_img)
+    return f"{key_name}.png", True
 
 
 class Rectangle:
@@ -87,15 +89,15 @@ def load_config(layout):
 if __name__ == "__main__":
     c64_types = ["breadbin", "c64c"]
     layouts = [
-        "us",
+        "en",
         "sv",
     ]
 
     for layout in layouts:
-        layout = "_" + layout if layout != "us" else ""
-        key_matrix, key_positions, special_keys = load_config(layout)
+        layout_sufix = "_" + layout if layout != "en" else ""
+        key_matrix, key_positions, special_keys = load_config(layout_sufix)
         for c64_type in c64_types:
-            pressed_keys = f"tools/images/{c64_type}_pressed{layout}.png"
+            pressed_keys = f"tools/images/{c64_type}_pressed{layout_sufix}.png"
             if not os.path.exists(pressed_keys):
                 continue
             img = cv2.imread(pressed_keys)
@@ -124,7 +126,7 @@ if __name__ == "__main__":
                     else:
                         key_text += unicodedata.name(s).replace(" ", "_")
                 key_text = key_text.lower()
-                filename, saved = save_square(img, x, y, w, h, c64_type, key_text, layout)
+                filename, saved = save_square(img, x, y, w, h, c64_type, key_text, layout,layout_sufix)
                 if saved:
                     saved_files += 1
                 # text = preprocess_image_for_ocr(filename)
@@ -141,9 +143,20 @@ if __name__ == "__main__":
                     }
                 )
 
+            if layout == "sv":
+                lang = "Swedish"
+            else:
+                lang = "English"
+
+            layout_w={
+                "type": c64_type,
+                "lang": layout,
+                "name" : lang,
+                "keys": square_details,
+            }
             json.dump(
-                square_details,
-                open(f"config/keyboard_layout/{c64_type}{layout}.json", "w"),
+                layout_w,
+                open(f"config/keyboard_layout/{c64_type}{layout_sufix}.json", "w"),
                 indent=4,
             )
             print(f"Saved {saved_files} keys for {c64_type} {layout}")

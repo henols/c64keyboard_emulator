@@ -20,7 +20,9 @@ import logging
 class C64KeyboardEmulator:
     WINDOW_TITLE = "C64 Keyboard, {layout} layout"
     WINDOW_GEOMETRY = "1006x290"
-    IMAGE_PATH = "images/{c64_type}_keyboard{lang}.png"
+    IMAGE_PATH = "images"
+    KEYBOARD_IMAGE_PATH = IMAGE_PATH + "/{c64_type}_keyboard{lang}.png"
+    KEY_IMAGE_PATH = IMAGE_PATH + "/keys/{key}"
 
     def __init__(self):
         self.logic = C64KeyboardLogic()
@@ -78,32 +80,6 @@ class C64KeyboardEmulator:
         if event.widget == self.window:
             self.logic.parse_key_combinations("RESET_MATRIX")
 
-    def parse_args(self):
-        parser = argparse.ArgumentParser(
-            description="c64keyboard, a C64 keyboard emulator."
-        )
-        specifyDevices = parser.add_mutually_exclusive_group(required=True)
-        specifyDevices.add_argument(
-            "-l",
-            "--list",
-            action="store_true",
-            help="List available USB devices and exit. Use this option to find a device for the -d / --device option.",
-        )
-        specifyDevices.add_argument(
-            "-d",
-            "--device",
-            action="store",
-            type=str,
-            dest="usbDevice",
-            help="Specify an Arduino-like USB device to use.",
-        )
-        specifyDevices.add_argument(
-            "-D",
-            "--dummy",
-            action="store_true",
-            help="Dummy mode. Don't connect to a device, log.debug all serial output to STDOUT instead.",
-        )
-        return parser.parse_args()
 
     def donothing(self):
         pass
@@ -145,48 +121,51 @@ class C64KeyboardEmulator:
         self.window.config(menu=menubar)
 
         self.canvas = tk.Canvas(self.window, height=290, width=1006)
-        self.bgImg = ImageTk.PhotoImage(
-            Image.open(
-                self.IMAGE_PATH.format(
-                    c64_type=self.logic.c64_type,
-                    lang=f"_{self.logic.lang}" if self.logic.lang else "",
-                )
-            )
-        )
-        self.canvas.create_image(0, 0, anchor=tk.NW, image=self.bgImg)
+
+        self.set_bg_image()
         self.canvas.pack()
 
         self.load_keyboard_layout()
 
         self.window.update()
 
+    def set_bg_image(self):
+        bg_image_path = self.logic.create_path(self.KEYBOARD_IMAGE_PATH)
+        self.log.debug(f"Loading background image {bg_image_path}")
+        self.bgImg = ImageTk.PhotoImage(Image.open(bg_image_path))
+        self.canvas.create_image(0, 0, anchor=tk.NW, image=self.bgImg)
+
     def populate_layout_menu(self, layoutmenu):
-        config_dir = "config/keyboard_layout"
-        for filename in os.listdir(config_dir):
-            if filename.endswith(".json"):
-                parts = filename.replace(".json", "").split("_")
-                if len(parts) == 2:
-                    c64_type, lang = parts
-                    layoutmenu.add_command(
-                        label=f"{c64_type} ({lang})",
-                        command=lambda c64_type=c64_type, lang=lang: self.change_layout(
-                            c64_type, lang
-                        ),
-                    )
+        layouts = self.logic.get_key_layouts()
+        for layout in layouts:
+            layoutmenu.add_command(
+                label=f"{layout[0]} ({layout[2]})",
+                command=lambda c64_type=layout[0], lang=layout[1]: self.change_layout(
+                    c64_type, lang
+                ),
+            )
+        # config_dir = "config/keyboard_layout"
+        # for filename in os.listdir(config_dir):
+        #     if filename.endswith(".json"):
+        #         parts = filename.replace(".json", "").split("_")
+        #         if len(parts) == 2:
+        #             c64_type, lang = parts
+        #         else:
+        #             c64_type = parts[0]
+        #             lang = "en"
+        #         layoutmenu.add_command(
+        #             label=f"{c64_type} ({lang})",
+        #             command=lambda c64_type=c64_type, lang=lang: self.change_layout(
+        #                 c64_type, lang
+        #             ),
+        #         )
 
     def load_keyboard_layout(self):
-        keyboard_layout = json.load(
-            open(
-                self.logic.CONFIG_PATH.format(
-                    c64_type=self.logic.c64_type,
-                    lang=f"_{self.logic.lang}" if self.logic.lang else "",
-                )
-            )
-        )
-
+        key_layout = self.logic.get_key_layout()
         self.key_imgages = {}
-        for key in keyboard_layout:
-            img = ImageTk.PhotoImage(Image.open(key["filename"]))
+        for key in key_layout:
+            key_path = self.KEY_IMAGE_PATH.format(key=key["filename"])
+            img = ImageTk.PhotoImage(Image.open(key_path))
             id = self.canvas.create_image(
                 key["x"], key["y"], anchor=tk.NW, image=img, state="hidden"
             )
@@ -194,42 +173,22 @@ class C64KeyboardEmulator:
 
     def change_layout(self, c64_type, lang):
         self.logic.load_config(c64_type, lang)
-        self.bgImg = ImageTk.PhotoImage(
-            Image.open(
-                self.IMAGE_PATH.format(
-                    c64_type=self.logic.c64_type,
-                    lang=f"_{self.logic.lang}" if self.logic.lang else "",
-                )
-            )
-        )
-        self.canvas.create_image(0, 0, anchor=tk.NW, image=self.bgImg)
+        self.set_bg_image()
+        self.window.title(self.WINDOW_TITLE.format(layout=self.logic.layout))
         self.load_keyboard_layout()
 
     def run(self):
         self.log.addHandler(self.create_debug_console_handler())
         self.log.setLevel(logging.DEBUG)
 
-        args = self.parse_args()
-        if args.list:
-            self.log.debug(
-                "\n".join(
-                    f"Device: {p.device} ; Description: {p.description}"
-                    for p in serial.tools.list_ports.comports()
-                )
-            )
+        try:
+            self.log.debug(f"Connecting to device: {self.serialDevice}")
+            self.conn = connection.SerialConnection(self.serialDevice)
+            # self.conn.connect()
+        except Exception as e:
+            self.log.debug(f"Cannot open serial device, exiting. Error: {e}")
             sys.exit()
-
-        self.serialDevice = args.usbDevice
-
-        if not args.dummy:
-            try:
-                self.log.debug(f"Connecting to device: {self.serialDevice}")
-                self.conn = connection.SerialConnection(self.serialDevice)
-                self.conn.connect()
-            except Exception as e:
-                self.log.debug(f"Cannot open serial device, exiting. Error: {e}")
-                sys.exit()
-            time.sleep(1)
+        # time.sleep(1)
 
         self.logic.load_config()
         self.initialize_gui()
