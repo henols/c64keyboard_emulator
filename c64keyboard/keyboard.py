@@ -5,20 +5,15 @@ import tkinter as tk
 from PIL import ImageTk, Image
 from . import connection
 from .keyboard_logic import C64KeyboardLogic
-import time
-import argparse
 import serial
 import serial.tools.list_ports
-import re
-import json
 import sys
-import termios
-import os
 import logging
 
 
 class C64KeyboardEmulator:
-    WINDOW_TITLE = "C64 Keyboard, {layout} layout"
+    WINDOW_TITLE_CONNECTED = "C64 Keyboard, {layout} layout - Connected {connected}"
+    WINDOW_TITLE = "C64 Keyboard, {layout} layout - Disconnected"
     WINDOW_GEOMETRY = "1006x290"
     IMAGE_PATH = "images"
     KEYBOARD_IMAGE_PATH = IMAGE_PATH + "/{c64_type}_keyboard{lang}.png"
@@ -80,7 +75,6 @@ class C64KeyboardEmulator:
         if event.widget == self.window:
             self.logic.parse_key_combinations("RESET_MATRIX")
 
-
     def donothing(self):
         pass
 
@@ -93,14 +87,19 @@ class C64KeyboardEmulator:
         console_handler.setFormatter(formatter)
         return console_handler
 
+    def on_hover(self, event):
+        print(f"Hovering over: {event}")
+
     def initialize_gui(self):
         self.window = tk.Tk()
         self.window.resizable(False, False)
-        self.window.title(self.WINDOW_TITLE.format(layout=self.logic.layout))
+        self.update_window_title()
         self.window.geometry(self.WINDOW_GEOMETRY)
         self.window.bind("<KeyPress>", lambda e: self.on_key_event(e, True))
         self.window.bind("<KeyRelease>", lambda e: self.on_key_event(e, False))
         self.window.bind("<FocusIn>", self.handle_focus)
+
+        self.window.bind_class("SerialConnection", self.populate_serial_menu)
 
         menubar = tk.Menu(self.window)
         filemenu = tk.Menu(menubar, tearoff=0)
@@ -117,6 +116,17 @@ class C64KeyboardEmulator:
         layoutmenu = tk.Menu(menubar, tearoff=0)
         self.populate_layout_menu(layoutmenu)
         menubar.add_cascade(label="Layout", menu=layoutmenu)
+
+        connections_menu = tk.Menu(menubar, tearoff=0)
+        serial_menu = tk.Menu(connections_menu, tearoff=0)
+
+        connections_menu.add_cascade(label="Serial", menu=serial_menu)
+        connections_menu.add_command(label="Network", command=self.donothing)
+        menubar.add_cascade(label="Connections", menu=connections_menu)
+
+        connections_menu.bind(
+            "<Enter>", lambda e: self.populate_serial_menu(serial_menu, e), add=True
+        )
 
         self.window.config(menu=menubar)
 
@@ -135,30 +145,36 @@ class C64KeyboardEmulator:
         self.bgImg = ImageTk.PhotoImage(Image.open(bg_image_path))
         self.canvas.create_image(0, 0, anchor=tk.NW, image=self.bgImg)
 
+    def populate_serial_menu(self, serial_menu, event):
+        serial_menu.delete(0, tk.END)
+        ports = serial.tools.list_ports.comports()
+        for port in ports:
+            serial_menu.add_command(
+                label=port.device,
+                command=lambda p=port.device: self.connect_serial(p),
+            )
+        if self.conn and self.conn.is_connected():
+            for index, port in enumerate(ports):
+                if port.device == self.serialDevice:
+                    serial_menu.entryconfig(index, label=f"{port.device} ✔")
+
+    def connect_serial(self, port):
+        try:
+            self.serialDevice = port
+            self.conn.set_serial(port)
+            self.log.debug(f"Connected to {self.serialDevice}")
+        except Exception as e:
+            self.log.debug(f"Failed to connect to {port}. Error: {e}")
+
     def populate_layout_menu(self, layoutmenu):
         layouts = self.logic.get_key_layouts()
         for layout in layouts:
             layoutmenu.add_command(
-                label=f"{layout[0]} ({layout[2]})",
+                label=f"{layout[0][:1].upper()}{layout[0][1:]} ({layout[2]})",
                 command=lambda c64_type=layout[0], lang=layout[1]: self.change_layout(
                     c64_type, lang
                 ),
             )
-        # config_dir = "config/keyboard_layout"
-        # for filename in os.listdir(config_dir):
-        #     if filename.endswith(".json"):
-        #         parts = filename.replace(".json", "").split("_")
-        #         if len(parts) == 2:
-        #             c64_type, lang = parts
-        #         else:
-        #             c64_type = parts[0]
-        #             lang = "en"
-        #         layoutmenu.add_command(
-        #             label=f"{c64_type} ({lang})",
-        #             command=lambda c64_type=c64_type, lang=lang: self.change_layout(
-        #                 c64_type, lang
-        #             ),
-        #         )
 
     def load_keyboard_layout(self):
         key_layout = self.logic.get_key_layout()
@@ -174,8 +190,22 @@ class C64KeyboardEmulator:
     def change_layout(self, c64_type, lang):
         self.logic.load_config(c64_type, lang)
         self.set_bg_image()
-        self.window.title(self.WINDOW_TITLE.format(layout=self.logic.layout))
+        self.update_window_title()
         self.load_keyboard_layout()
+
+    def update_window_title(self):
+        if self.conn and self.conn.is_connected():
+            self.window.title(
+                self.WINDOW_TITLE_CONNECTED.format(
+                    layout=self.logic.layout, connected=self.conn.connection_path
+                )
+            )
+        else:
+            self.window.title(self.WINDOW_TITLE.format(layout=self.logic.layout))
+
+    def connection_callback(self, event):
+        print(f"Event: {event}")
+        self.update_window_title()
 
     def run(self):
         self.log.addHandler(self.create_debug_console_handler())
@@ -183,8 +213,9 @@ class C64KeyboardEmulator:
 
         try:
             self.log.debug(f"Connecting to device: {self.serialDevice}")
-            self.conn = connection.SerialConnection(self.serialDevice)
-            # self.conn.connect()
+            self.conn = connection.SerialConnection(
+                self.serialDevice, self.connection_callback
+            )
         except Exception as e:
             self.log.debug(f"Cannot open serial device, exiting. Error: {e}")
             sys.exit()

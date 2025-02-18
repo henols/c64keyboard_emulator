@@ -10,41 +10,36 @@ RECONNECT_DELAY = 5  # seconds
 
 
 class SerialConnection:
-    def __init__(self, path=None):
+    def __init__(self, path=None, callback=None):
         self.log = logging.getLogger("SerialConnection")
         self.log.addHandler(self.create_debug_console_handler())
         self.log.setLevel(logging.DEBUG)
         self.log.debug(f"Creating serial connection: {path}")
 
+        self.callback = callback
+
         self.connected = False
-        self.path = path
+        self.connection_path = path
         self.monitor_thread = threading.Thread(target=self.monitor_connection)
         self.monitor_thread.daemon = True
         self.monitor_thread.start()
 
     def _connect(self, path=None):
         if path:
-            self.path = path
-        # self.log.debug(
-        #     "\n".join(
-        #         f"Device: {p.device} ; Description: {p.description}"
-        #         for p in serial.tools.list_ports.comports()
-        #     )
-        # )
+            self.connection_path = path
         connect = False
         for p in serial.tools.list_ports.comports():
             # self.log.debug(f"Device: {p.device} ; Description: {p.description}")
-            if p.device == self.path:
+            if p.device == self.connection_path:
                 connect = True
                 break
 
         if not connect:
-            self.log.debug(f"Device {self.path} not found")
+            self.log.debug(f"Device {self.connection_path} not found")
             return None
-        
-        try:
-            self.ser = serial.Serial(self.path, BAUD, timeout=0.1)
 
+        try:
+            self.ser = serial.Serial(self.connection_path, BAUD, timeout=0.1)
 
             self.ser.write((3).to_bytes(1, byteorder="big"))
             self.ser.write(b"cbm")
@@ -57,13 +52,13 @@ class SerialConnection:
                     return
                 line = line.decode("utf-8").strip()
                 self.log.debug(f"Received: {line}")
-                if  line == "c64":
-                    self.connected =True
+                if line == "c64":
+                    self.connected = True
                     break
         except serial.SerialException as e:
-            self.log.debug(f"Cannot open serial device {self.path}")
+            self.log.debug(f"Cannot open serial device {self.connection_path}")
             raise e
-        
+
         if self.connected:
             self.post_event("connected")
 
@@ -74,18 +69,24 @@ class SerialConnection:
         self.post_event("disconnected")
 
     def connect(self):
-        if not (self.connected or self.path):
+        if not (self.connected or self.connection_path):
             return
-            
-        self.log.debug(f"Attempting to reconnect to {self.path}...")
+
+        self.log.debug(f"Attempting to reconnect to {self.connection_path}...")
         if not self.connected:
             try:
                 self._connect()
                 if self.connected:
-                    self.log.info(f"Connected to {self.path}")
-          
+                    self.log.info(f"Connected to {self.connection_path}")
+
             except serial.SerialException:
                 self.log.debug(f"Connection failed.")
+
+    def set_serial(self, path=None):
+        self.connection_path = path
+        if self.connected:
+            self._disconnect()
+        self.connect()
 
     def write(self, data):
         try:
@@ -119,14 +120,16 @@ class SerialConnection:
             self._disconnect()
 
     def post_event(self, event_type):
-        print(f"Event: {event_type}")
+        if self.callback:
+            event = {"type": event_type, "path": self.connection_path}
+            self.callback(event)
 
     def monitor_connection(self):
         while self.monitor_thread.daemon:
             if self.connected:
                 ports = [p.device for p in serial.tools.list_ports.comports()]
-                if self.path not in ports:
-                    self.log.debug(f"Port {self.path} disappeared")
+                if self.connection_path not in ports:
+                    self.log.debug(f"Port {self.connection_path} disappeared")
                     self.connected = False
                     self.post_event("disconnected")
             else:
