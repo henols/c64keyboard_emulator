@@ -39,15 +39,15 @@ class SerialConnection:
             return None
 
         try:
-            self.ser = serial.Serial(self.connection_path, BAUD, timeout=0.1)
+            self.serial_connection = serial.Serial(self.connection_path, BAUD, timeout=0.1)
 
-            self.ser.write((3).to_bytes(1, byteorder="big"))
-            self.ser.write(b"cbm")
-            self.ser.flush()
+            self.serial_connection.write((3).to_bytes(1, byteorder="big"))
+            self.serial_connection.write(b"cbm")
+            self.serial_connection.flush()
             time.sleep(1)
             # time.sleep(4)
             while True:
-                line = self.ser.readline()
+                line = self.serial_connection.readline()
                 if not line:
                     return
                 line = line.decode("utf-8").strip()
@@ -64,8 +64,8 @@ class SerialConnection:
 
     def _disconnect(self):
         self.connected = False
-        if self.ser:
-            self.ser.close()
+        if self.serial_connection:
+            self.serial_connection.close()
         self.post_event("disconnected")
 
     def connect(self):
@@ -88,24 +88,29 @@ class SerialConnection:
             self._disconnect()
         self.connect()
 
-    def write(self, data):
+    def send_data(self, data):
         try:
-            if self.connected:
-                return self.ser.write(data)
+            if self.connected and data:
+                self.serial_connection.write(bytearray([len(data)]) )
+                sent = self.serial_connection.write(data)
+                self.log.debug(f"Data len {len(data)} Sent {sent} bytes")
+                self.serial_connection.flush()
+                return sent
         except serial.SerialException:
             self._disconnect()
+        return 0
 
     def readline(self):
         try:
             if self.connected:
-                return self.ser.readline()
+                return self.serial_connection.readline()
         except serial.SerialException:
             self._disconnect()
-            return None
+        return None
 
     def close(self):
         if self.connected:
-            self.ser.close()
+            self.serial_connection.close()
             self.connected = False
             self.post_event("disconnected")
 
@@ -115,14 +120,17 @@ class SerialConnection:
     def flush(self):
         try:
             if self.connected:
-                self.ser.flush()
+                self.serial_connection.flush()
         except serial.SerialException:
             self._disconnect()
 
     def post_event(self, event_type):
         if self.callback:
             event = {"type": event_type, "path": self.connection_path}
-            self.callback(event)
+            self.monitor_thread = threading.Thread(target=self.callback(event))
+            self.monitor_thread.start()
+
+            # self.callback(event)
 
     def monitor_connection(self):
         while self.monitor_thread.daemon:

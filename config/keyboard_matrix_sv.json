@@ -72,7 +72,10 @@
         "*": "SHIFT_LEFT|:",
         "aring": "å",
         "adiaeresis": "ä",
-        "odiaeresis": "ö"
+        "odiaeresis": "ö",
+        "{": "(",
+        "}": ")"
+
     },
     "special-release-keys":{
         "[": "å",

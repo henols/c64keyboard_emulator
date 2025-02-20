@@ -6,12 +6,11 @@ import time
 
 
 class C64KeyboardLogic:
-    HEX_PREFIX = "0x"
     LINE_PREFIX = "CommadLine:"
     LOAD_8 = LINE_PREFIX + "load" + ("{CURSOR_RIGHT}") * 19 + ",8:{RETURN}"
     LOAD_DIR = LINE_PREFIX + 'load"$",8:{RETURN}'
 
-    CONFIG_PATH = "config/"
+    CONFIG_PATH = "config"
     KEY_CONFIG_PATH = "{config_path}/key_config.json"
     KEYBOARD_LAYOUT_PATH = "{config_path}/keyboard_layout"
     KEYBOARD_LAYOUT_FILE_PATH = KEYBOARD_LAYOUT_PATH + "/{c64_type}{lang}.json"
@@ -43,7 +42,11 @@ class C64KeyboardLogic:
             if filename.endswith(".json"):
                 keyboard_layout = json.load(open(f"{config_dir}/{filename}"))
                 layout_info.append(
-                    (keyboard_layout["type"], keyboard_layout["lang"], keyboard_layout["name"])
+                    (
+                        keyboard_layout["type"],
+                        keyboard_layout["lang"],
+                        keyboard_layout["name"],
+                    )
                 )
         return layout_info
 
@@ -104,13 +107,17 @@ class C64KeyboardLogic:
         return values
 
     def build_key_combination(self, c, pressed=True):
-        key_combo = ""
+        if not c:
+            return None
+        key_combo = None
         if self.get_matrix_value(c) >= 0:
             key_combo = ("SHIFT_LEFT_OFF|" if c in self.no_shift else "") + c
         elif len(c) == 1 and re.match("[A-ZÅÄÖ]", c):
             key_combo = "SHIFT_LEFT|" + c.lower()
         elif c in self.key_mappings:
             key_combo = self.key_mappings[c]
+        elif re.match("\\{.*\\}", c) :
+            key_combo = c[1:-1]
 
         if key_combo == "LOAD_DIR":
             key_combo = self.LOAD_DIR
@@ -122,41 +129,58 @@ class C64KeyboardLogic:
             if value:
                 key_combo = key_combo + "|" + value
 
+
+        if key_combo and key_combo != c and not '|' in key_combo:
+            self.log.debug(f"Key: {c} -> {key_combo}")
+            tmp_combo = self.build_key_combination(key_combo, pressed)
+            if tmp_combo:
+                return tmp_combo
+            return key_combo
         return key_combo
 
-    def parse_key_combinations(self, key_combo, pressed=True):
+    def parse_key_combination(self, key_combo, pressed=True):
         values = self.combination_to_matrix(key_combo, pressed)
 
         if values:
             self.log.debug(f"key combination: {key_combo}")
-            hex_string = " ".join(
-                f"{self.HEX_PREFIX}{element:02X}" for element in values
-            )
+            hex_string = " ".join(f"0x{element:02X}" for element in values)
             self.log.debug(f"values: {hex_string}")
             return values
         else:
             self.log.debug(f"Unknown key combination: {key_combo}")
             self.log.debug("----------------------------------------")
-            return None
+            return b''
 
-    def process_key(self, c, pressed=True):
+    def translate_key(self, c, pressed=True):
         hex_string = ""
         if re.match("[\\w!@#$%^&*()-_=+\\\\|,<.>/?`~\\[\\]{}\"\\']", c):
-            self.log.debug(f"'{c}' in hex = 0x")
+            self.log.debug(f"'{c}' key: {hex_string}")
         else:
             for element in c:
                 hex_string += f"0x{ord(element):02X} "
-        self.log.debug(f"other key: {hex_string}")
+            self.log.debug(f"other key: {hex_string}")
 
         key_combo = self.build_key_combination(c, pressed)
+        if key_combo:
+            return self.trasnslate_key_combination(key_combo, pressed)
+        return None
+
+    def trasnslate_key_combination(self, key_combo, pressed=True):
         if key_combo.startswith(self.LINE_PREFIX):
             if not pressed:
                 return
-            self.parse_key_combinations("TEXT", True)
-            for m in re.finditer(r"(\{(\w+)\})|.", key_combo[len(self.LINE_PREFIX) :]):
-                key_combo = self.build_key_combination(m.group().strip("{}"))
-                self.parse_key_combinations(key_combo)
-                time.sleep(0.05)
-            self.parse_key_combinations("TEXT", False)
+            self.log.debug(f"Process command line: {key_combo}")
+            values = self.parse_key_combination("TEXT", True)
+            text = key_combo[len(self.LINE_PREFIX) :]
+            text = text.replace("\n", "{RETURN}").replace(" ", "{SPACE}").replace('|', '{UP_ARROW}').replace('_', '{LEFT_ARROW}')
+            self.log.debug(f"Text: {text}")
+            for m in re.finditer(r"(\{(\w+)\})|.", text):
+                key_combo = self.build_key_combination(m.group())
+                if key_combo:
+                    values.extend(self.parse_key_combination(key_combo))
+                # time.sleep(0.05)
+            values.extend(self.parse_key_combination("TEXT", False))
+            return values
         else:
-            return self.parse_key_combinations(key_combo, pressed)
+            self.log.debug(f"Process key combination: {key_combo}")
+            return self.parse_key_combination(key_combo, pressed)

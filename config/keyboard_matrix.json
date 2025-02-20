@@ -69,6 +69,8 @@
     "no-shift": "+,.:-@£*/=^",
     "key-mappings": {
         "[": "SHIFT_LEFT|:",
-        "]": "SHIFT_LEFT|;"
+        "]": "SHIFT_LEFT|;",
+        "{": "(",
+        "}": ")"
     }
 }

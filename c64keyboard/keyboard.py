@@ -8,6 +8,7 @@ from .keyboard_logic import C64KeyboardLogic
 import serial
 import serial.tools.list_ports
 import sys
+import time
 import logging
 
 
@@ -21,15 +22,15 @@ class C64KeyboardEmulator:
 
     def __init__(self):
         self.logic = C64KeyboardLogic()
-        self.serialDevice = None
-        self.conn = None
+        self.serial_device = None
+        self.connection = None
         self.log = logging.getLogger("c64keyboard")
         self.window = None
         self.canvas = None
         self.key_imgages = {}
 
     def decode_key(self, event):
-        self.log.debug(f"event: {event}")
+        # self.log.debug(f"event: {event}")
         if event.keysym_num >= 33 and event.keysym_num <= 126:
             key = chr(event.keysym_num)
         elif event.keysym == "??":
@@ -42,27 +43,29 @@ class C64KeyboardEmulator:
 
     def on_key_event(self, event, pressed):
         key = self.decode_key(event)
-        self.log.debug(f"Key {'pressed' if pressed else 'released'}: {key}")
-        values = self.logic.process_key(key, pressed)
+        # self.log.debug(f"Key {'pressed' if pressed else 'released'}: {key}")
+        self.send_key(key, pressed)
+
+    def send_key(self, key, pressed):
+        values = self.logic.translate_key(key, pressed)
         if values:
+            self.connection.send_data(values)
             for val in values:
                 img = self.key_imgages.get(val & 0x7F, None)
                 if img:
                     s = "normal" if val & 0x80 else "hidden"
                     self.canvas.itemconfig(img["id"], state=s)
-                if val & 0xC3 == 0xC3 or val & 0x44 == 0x44:
+                if val & 0xC3 or val & 0x44:
                     for img in self.key_imgages.values():
                         self.canvas.itemconfig(img["id"], state="hidden")
-            if self.conn and self.conn.is_connected():
-                self.conn.write(bytearray([len(values)]))
-                self.conn.write(values)
-                self.conn.flush()
+                # time.sleep(0.5)
+
             self.log.debug("------------ Sent-----------------------")
 
     def read_input(self):
-        if self.conn and self.conn.is_connected():
+        if self.connection and self.connection.is_connected():
             while True:
-                line = self.conn.readline()
+                line = self.connection.readline()
                 if line and len(line.strip()) > 0:
                     data = line.decode("utf-8").strip()
                     self.log.debug(f" --> {data}")
@@ -73,7 +76,20 @@ class C64KeyboardEmulator:
 
     def handle_focus(self, event):
         if event.widget == self.window:
-            self.logic.parse_key_combinations("RESET_MATRIX")
+            if self.connection and self.logic:
+                data = self.logic.parse_key_combination("RESET_MATRIX")
+                self.connection.send_data(data)
+
+    def paste(self, event=None):
+        text = self.window.clipboard_get()
+        self.log.debug(f"Pasting: {text}")
+        # self.log.info(f"----------------------------")
+        n = 100
+        for t in list(text[i : i + n] for i in range(0, len(text), n)):
+            # self.log.info(f"sending part: '{t}'  {len(t)}")
+            # self.log.info(f"----------------------------")
+            data = self.logic.trasnslate_key_combination(f"{self.logic.LINE_PREFIX}{t}")
+            self.connection.send_data(data)
 
     def donothing(self):
         pass
@@ -95,8 +111,10 @@ class C64KeyboardEmulator:
         self.window.resizable(False, False)
         self.update_window_title()
         self.window.geometry(self.WINDOW_GEOMETRY)
-        self.window.bind("<KeyPress>", lambda e: self.on_key_event(e, True))
-        self.window.bind("<KeyRelease>", lambda e: self.on_key_event(e, False))
+        self.window.bind("<KeyPress>", lambda e: self.on_key_event(e, True), add=True)
+        self.window.bind(
+            "<KeyRelease>", lambda e: self.on_key_event(e, False), add=True
+        )
         self.window.bind("<FocusIn>", self.handle_focus)
 
         self.window.bind_class("SerialConnection", self.populate_serial_menu)
@@ -110,7 +128,7 @@ class C64KeyboardEmulator:
         menubar.add_cascade(label="File", menu=filemenu)
 
         helpmenu = tk.Menu(menubar, tearoff=0)
-        helpmenu.add_command(label="Paste", command=self.donothing)
+        helpmenu.add_command(label="Paste", command=self.paste, accelerator="Ctrl+V")
         menubar.add_cascade(label="Edit", menu=helpmenu)
 
         layoutmenu = tk.Menu(menubar, tearoff=0)
@@ -127,13 +145,14 @@ class C64KeyboardEmulator:
         connections_menu.bind(
             "<Enter>", lambda e: self.populate_serial_menu(serial_menu, e), add=True
         )
-
         self.window.config(menu=menubar)
 
         self.canvas = tk.Canvas(self.window, height=290, width=1006)
 
         self.set_bg_image()
         self.canvas.pack()
+
+        self.window.bind_all("<Control-v>", self.paste)
 
         self.load_keyboard_layout()
 
@@ -153,16 +172,15 @@ class C64KeyboardEmulator:
                 label=port.device,
                 command=lambda p=port.device: self.connect_serial(p),
             )
-        if self.conn and self.conn.is_connected():
+        if self.connection and self.connection.is_connected():
             for index, port in enumerate(ports):
-                if port.device == self.serialDevice:
+                if port.device == self.connection.connection_path:
                     serial_menu.entryconfig(index, label=f"{port.device} ✔")
 
     def connect_serial(self, port):
         try:
-            self.serialDevice = port
-            self.conn.set_serial(port)
-            self.log.debug(f"Connected to {self.serialDevice}")
+            self.log.debug(f"Setting serial port {port}")
+            self.connection.set_serial(port)
         except Exception as e:
             self.log.debug(f"Failed to connect to {port}. Error: {e}")
 
@@ -194,28 +212,29 @@ class C64KeyboardEmulator:
         self.load_keyboard_layout()
 
     def update_window_title(self):
-        if self.conn and self.conn.is_connected():
+        if self.connection and self.connection.is_connected():
             self.window.title(
                 self.WINDOW_TITLE_CONNECTED.format(
-                    layout=self.logic.layout, connected=self.conn.connection_path
+                    layout=self.logic.layout, connected=self.connection.connection_path
                 )
             )
         else:
             self.window.title(self.WINDOW_TITLE.format(layout=self.logic.layout))
 
     def connection_callback(self, event):
-        print(f"Event: {event}")
+        # print(f"Event: {event}")
         self.update_window_title()
+        if self.connection and self.logic:
+            if event["type"] == "connected":
+                data = self.logic.parse_key_combination("RESET_MATRIX")
+                self.connection.send_data(data)
 
     def run(self):
         self.log.addHandler(self.create_debug_console_handler())
         self.log.setLevel(logging.DEBUG)
 
         try:
-            self.log.debug(f"Connecting to device: {self.serialDevice}")
-            self.conn = connection.SerialConnection(
-                self.serialDevice, self.connection_callback
-            )
+            self.connection = connection.SerialConnection(callback=self.connection_callback)
         except Exception as e:
             self.log.debug(f"Cannot open serial device, exiting. Error: {e}")
             sys.exit()
